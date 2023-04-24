@@ -1,33 +1,26 @@
-import PropTypes from 'prop-types';
 import { Button, Container, List, ContactItem } from './ContactList.module';
-import { useDispatch } from 'react-redux';
-import { delContactsThunk } from 'redux/operations';
+import { useSelector, useDispatch } from 'react-redux';
+import { deleteContact } from 'redux/operations';
+import { selectVisibleContacts } from 'redux/selectors';
 
-const ContactList = ({ listContact }) => {
+const ContactList = () => {
+  const visibleContacts = useSelector(selectVisibleContacts);
   const dispatch = useDispatch();
-  return listContact.map(contact => { 
+  
     return (
-      <Container key={contact.id}>
-        <List>         
-            <ContactItem key={contact.id}> 
-              {contact.name}: {contact.number} 
-              <Button
-                onClick={() => {
-                  dispatch(delContactsThunk(contact.id))
-                }}
-              >
-                Delete
+      <Container>
+        <List>
+          {visibleContacts.map(({ name, number, id }) => (
+            <ContactItem key={id}>
+              {name}: {number}
+              <Button type="button" onClick={() => dispatch(deleteContact(id))}>
+                delete
               </Button>
-            </ContactItem>       
+            </ContactItem>
+          ))}
         </List>
       </Container>
     );
-  });
-};
-
-
-ContactList.propTypes = {
-  listContact: PropTypes.array.isRequired,
-};
+  };
 
 export default ContactList;

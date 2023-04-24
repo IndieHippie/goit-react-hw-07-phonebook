@@ -1,50 +1,49 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Form, Input, Button } from 'components/ContactForn/ContactForm.module';
 import { useDispatch, useSelector } from 'react-redux';
-import { addContactsThunk, getContactsThunk } from 'redux/operations';
+import { nanoid } from 'nanoid';
+import { addContact } from 'redux/operations';
+import { selectContacts } from 'redux/selectors';
 
 const ContactForm = () => {
+  const contacts = useSelector(selectContacts);
   const dispatch = useDispatch();
+  
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
-  useEffect(() => {
-    dispatch(getContactsThunk());
-  }, [dispatch]);
-
-  const handleChange = e => {
-    const { name, value } = e.target;
-    if (name === 'name') {
-      setName(value);
-    } else {
-      setNumber(value);
+   const inputChange = event => {
+    switch (event.target.name) {
+      case 'name':
+        setName(event.target.value);
+        break;
+      case 'number':
+        setNumber(event.target.value);
+        break;
+      default:
+        console.log('er');
     }
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = event => {
+    event.preventDefault();
+  
+    const isContactRepeat = contacts.find(el => el.name === name);
+
+    if (isContactRepeat) {
+      alert('Already in Contacts');
+      return;
+    }
     const contact = {
-      name: name,
-      phone: number,
+      name,
+      number,
+      id: nanoid(),
     };
-    e.preventDefault();
-    if (
-      contacts.some(
-        value => value.name.toLocaleLowerCase() === name.toLocaleLowerCase()
-      )
-    ) {
-      alert(`${name} is alredy in contacts`);
-    } else {
-      dispatch(addContactsThunk(contact));
-    }
-    reset();
-  };
 
-  const reset = () => {
-    setName('');
-    setNumber('');
-  };
+    dispatch(addContact(contact));
 
-  const contacts = useSelector(state => state.contacts.items);
+    event.target.reset();
+  };
 
   return (
     <div>
@@ -53,7 +52,7 @@ const ContactForm = () => {
           <span>Name</span>
         </label>
         <Input
-          onChange={handleChange}
+          onChange={inputChange}
           value={name}
           type="text"
           name="name"
@@ -65,7 +64,7 @@ const ContactForm = () => {
           <span>Number</span>
         </label>
         <Input
-          onChange={handleChange}
+          onChange={inputChange}
           value={number}
           type="tel"
           name="number"

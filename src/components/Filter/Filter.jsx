@@ -1,9 +1,8 @@
 import { Label, Section, Input } from './Filter.module';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { filterContact } from 'redux/sliceFilter';
 
 const Filter = () => {
-  const filter = useSelector(state => state.filter);
   const dispatch = useDispatch();
   return (
     <Section>
@@ -11,11 +10,10 @@ const Filter = () => {
       <Input
         type="text"
         name="filter"
-        pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-        title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-        onChange={e => dispatch(filterContact(e.currentTarget.value))}
-        value={filter}
-        required
+        onChange={e => {
+          const action = filterContact(e.target.value);
+          dispatch(action);
+        }}
       />
     </Section>
   );

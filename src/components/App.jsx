@@ -1,20 +1,19 @@
 import React from 'react';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchContacts } from 'redux/operations';
 import ContactForm from './ContactForn/ContactForm';
 import ContactList from './ContactList/ContactList';
 import Filter from './Filter/Filter';
 import { AppStyled } from './App.module';
-import { useSelector } from 'react-redux';
+
 
 function App() {
-  const contacts = useSelector(state => state.contacts.items);
-  const filtered = useSelector(state => state.filter);
+  const dispatch = useDispatch();
 
-  const getFilteredContacts = e => {
-    const filteredContacts = contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filtered.toLowerCase())
-    );
-    return filteredContacts;
-  };
+  useEffect(() => {
+    dispatch(fetchContacts())
+  }, [dispatch]);
 
   return (
     <AppStyled>
@@ -22,7 +21,7 @@ function App() {
       <ContactForm />
       <h3>Contacts</h3>
       <Filter />
-      <ContactList listContact={getFilteredContacts()} />
+      <ContactList/>
     </AppStyled>
   );
 }
